@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<title>PUFS Test</title>
+		<script src="/pufs2/jquery.js"></script>
+		<script src="/pufs2/pufs.js"></script>
+		<script src="/pufs2/controller.js"></script>
+		<link rel="stylesheet" type="text/css" href="/pufs/style.css">
+	</head>
+	<body>
+		<ul data-filter="test" id="filter">
+			<li data-filter="unfiltered">All</li>
+			<li data-filter="animals">Only Animals</li>
+			<li data-filter="vegetables">Only Vegetables</li>
+			<li data-filter="minerals">Only Minerals</li>
+		</ul>
+		
+		<input type="text" id="pufs-search">
+		
+		<div id="holder">
+			<ul id="list">
+				<li data-filter="animals" data-search-content="duck">Duck</li>
+				<li data-filter="vegetables" data-search-content="lettuce">Lettuce</li>
+				<li data-filter="minerals" data-search-content="pegmatite">Pegmatite</li>
+				<li data-filter="animals" data-search-content="dog">Dog</li>
+				<li data-filter="vegetables" data-search-content="carrot">Carrot</li>
+				<li data-filter="minerals" data-search-content="salt">Salt</li>
+				<li data-filter="animals" data-search-content="rabbit">Rabbit</li>
+				<li data-filter="vegetables" data-search-content="tomato">Tomato</li>
+				<li data-filter="minerals" data-search-content="iron">Iron</li>
+				<li data-filter="animals" data-search-content="horse">Horse</li>
+				<li data-filter="vegetables" data-search-content="onion">Onion</li>
+				<li data-filter="minerals" data-search-content="zinc">Zinc</li>
+				<li data-filter="animals" data-search-content="horse">Horse</li>
+				<li data-filter="vegetables" data-search-content="onion">Onion</li>
+				<li data-filter="minerals" data-search-content="zinc">Zinc</li>
+			</ul>
+		</div>
+	</body>
+</html>
