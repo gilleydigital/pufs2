@@ -9,9 +9,10 @@
 			page_length: 6,
 			next_prev: false,
 			filter: false,
-			filter_selector: '#pufs-filter',			
+			filter_selector: '#pufs-filter li',			
 			search: false,
-			search_selector: '#pufs-search'
+			search_selector: '#pufs-search',
+			search_interval: 150
 		}, options );
 		
 		// Store the elements we create for later access
@@ -21,6 +22,35 @@
 			next_button: false,
 			page_numbers: []
 		};
+		
+		// Where we store currently active filters
+		list.filters = {};
+	
+		// Initialize the elements
+		initialize(list);
+		
+		// Filter
+		if (list.settings.filter !== false) {
+			$(list.settings.filter_selector).click(update_filter(list));
+		}
+		
+		// Search Bar
+		if (list.settings.search !== false) {
+			var typing_timer;
+
+			// Start the countdown on keyup
+			$(list.settings.search_selector).keyup(function(){
+			    clearTimeout(typing_timer);
+		        typing_timer = setTimeout(update_search, list.settings.search_interval, list, list.settings.search_selector.val);
+			});
+		}
+		
+		return list;
+	};
+	
+	function initialize(list) {
+		// Store filters
+		list.filters = {};
 		
 		// Number of child elements
 		var list_length = list.children(list.settings.selector).length;
@@ -52,11 +82,11 @@
 		// Create next/prev buttons if applicable
 		if (list.settings.next_prev === true) {
 			// Prev Button
-			var prev_button = $('<li class="pufs-prev-button">Previous</li>')
+			var prev_button = $('<li id="pufs-prev-button">Previous</li>')
 				.hide();
 
 			// Next Button
-			var next_button = $('<li class="pufs-next-button">Next</li>')
+			var next_button = $('<li id="pufs-next-button">Next</li>')
 				.hide();
 				
 			// User clicks prev
@@ -72,28 +102,81 @@
 			// Add the buttons to the page
 			pagination.prepend(prev_button);
 			pagination.append(next_button);
+			
+			// Show Next Button if there are multiple pages
+			if (num_pages >= 1) {
+				next_button.fadeIn();
+			}
 		}
 
 		// Add the pagination to the elements list for later access
 		list.elements.pagination = pagination;
 		
 		// Add the pagination to the page
-		list.after(pagination);
-		
-		if (num_pages >= 1) {
-			next_button.fadeIn();
+		list.after(pagination);		
+	}
+	
+	// Change the selector after a change in filtering
+	function update_filter(list) {
+		var func = function() {
+			// Get the string we will filter on
+			var filter = $(this).data('pufs-filter');
+			
+			// Set the filter
+			list.filters.filter = filter;
+			
+			execute_filters(list);
 		}
 		
-		return list;
-	};
+		return func;
+	}
 	
-	// Reset paging after a change in filtering
-	function reset_paging() {
+	// Change the selector after a change in search string
+	function update_search(list, search) {
+		// Set the search filter
+		list.filters.search = search;
 		
+		execute_filters(list);
 	}
 	
 	// Progress the paging state
 	function go_to_page(list, target) {
+		var func = function() {
+			
+		}
+		
+		return func;
+	}
+	
+	// Combine the filters together
+	function execute_filters(list) {
+		// Create the selector
+		var selector = list.settings.selector;
+
+		// Filter info
+		if (list.filters.filter) {
+			selector = selector + '[data-pufs-filter="' + list.filters.filter + '"]';
+		}
+		
+		// Search info
+		if (list.filters.search) {
+			selector = selector + '[data-pufs-search*="' + list.filters.search + '"]';
+		}
+
+		// Hide em all
+		list.children(list.settings.selector).hide();
+		
+		// Let the filter sort em out
+		list.children(selector)
+			.addClass('pufs-active')
+			.fadeIn();
+
+		// Reset Paging
+		reset_paging(list);
+	}
+	
+	// Reset paging after a change in filtering
+	function reset_paging(list) {
 		
 	}
 	
