@@ -37,11 +37,15 @@
 		// Search Bar
 		if (list.settings.search !== false) {
 			var typing_timer;
+			var search_value;
 
 			// Start the countdown on keyup
 			$(list.settings.search_selector).keyup(function(){
 			    clearTimeout(typing_timer);
-		        typing_timer = setTimeout(update_search, list.settings.search_interval, list, list.settings.search_selector.val);
+			
+				search_value = $(this).val();
+				
+		        typing_timer = setTimeout(update_search, list.settings.search_interval, list, search_value);
 			});
 		}
 		
@@ -58,6 +62,9 @@
 		// Calculate the number of pages
 		var num_pages = Math.ceil(list_length / list.settings.page_length);
 		list.data('num_pages', num_pages);
+		
+		// Current page
+		list.data('page', 1);
 
 		// Create the pagination element
 		var pagination = $('<div id="pufs-pagination"></div>')
@@ -66,7 +73,7 @@
 		// Add the list elements
 		for (var i = 1; i <= list.data('num_pages'); i++) {
 			var page_number = $('<li class="pufs-page-number"></li>')
-				.data('pufs-page-number', i)
+				.attr('data-pufs-page-number', i)
 				.text(i);
 			
 			// User clicks page number
@@ -113,7 +120,9 @@
 		list.elements.pagination = pagination;
 		
 		// Add the pagination to the page
-		list.after(pagination);		
+		list.after(pagination);
+		
+		reset_paging(list);
 	}
 	
 	// Change the selector after a change in filtering
@@ -139,15 +148,6 @@
 		execute_filters(list);
 	}
 	
-	// Progress the paging state
-	function go_to_page(list, target) {
-		var func = function() {
-			
-		}
-		
-		return func;
-	}
-	
 	// Combine the filters together
 	function execute_filters(list) {
 		// Create the selector
@@ -164,12 +164,12 @@
 		}
 
 		// Hide em all
-		list.children(list.settings.selector).hide();
+		list.children(list.settings.selector)
+			.addClass('pufs-filtered-out');
 		
 		// Let the filter sort em out
 		list.children(selector)
-			.addClass('pufs-active')
-			.fadeIn();
+			.removeClass('pufs-filtered-out');
 
 		// Reset Paging
 		reset_paging(list);
@@ -177,7 +177,120 @@
 	
 	// Reset paging after a change in filtering
 	function reset_paging(list) {
+		// Elements are filtered so we just need to get those
+		var filtered_selector = list.settings.selector + ':not(.pufs-filtered-out)';
+
+		var list_length = list.children(filtered_selector).length;
 		
+		var num_pages = Math.ceil(list_length / list.settings.page_length);
+		list.data('num_pages', num_pages);
+		
+		$.each(list.elements.page_numbers, function(key, val) {
+			val.hide();
+		});
+				
+		// Fade in the list elements
+		var from = 0;
+		var to = num_pages;
+
+		$.each(list.elements.page_numbers.slice(from, to), function(key, val) {
+			val.fadeIn();
+		});
+
+		// Go to page 1
+		target_page = 1;
+		
+		// Active class for styling
+		$('#pufs-pagination .pufs-page-number').removeClass('active');
+		$('#pufs-pagination .pufs-page-number[data-pufs-page-number="'+ target_page +'"]').addClass('active');
+
+		// Hide all the list elements
+		list.children(list.settings.selector)
+			.hide();
+
+		// Fade in the list elements
+		var from = (target_page - 1) * list.settings.page_length;
+		var to = target_page * list.settings.page_length;
+
+		list.children(list.settings.selector + ':not(.pufs-filtered-out)')
+			.slice(from, to)
+			.fadeIn();
+
+		// Keep track of what page we're on
+		list.data('page', target_page);
+		
+		// Update next/prev buttons
+		if (list.settings.next_prev === true) {
+			// Next Button
+			if (num_pages > 1) {
+				$('#pufs-pagination').show();
+				$('#pufs-next-button').fadeIn();
+			}
+			else {
+				$('#pufs-pagination').hide();
+			}
+
+			$('#pufs-prev-button').hide();
+		}
+	}
+	
+	// Progress the paging state
+	function go_to_page(list, target) {
+		var func = function() {
+			var target_page;
+			var current_page = list.data('page');
+
+			// Set the list page
+			if (target === 'prev') {
+				target_page = current_page - 1;
+			}
+			else if (target === 'next') {
+				target_page = current_page + 1;			
+			}
+			else if ($.isNumeric(target)) {
+				target_page = target;
+			}
+
+			// Active class for styling
+			$('#pufs-pagination .pufs-page-number').removeClass('active');
+			$('#pufs-pagination .pufs-page-number[data-pufs-page-number="'+ target_page +'"]').addClass('active');
+
+			// Hide all the list elements
+			list.children(list.settings.selector)
+				.hide();
+
+			// Fade in the list elements
+			var from = (target_page - 1) * list.settings.page_length;
+			var to = target_page * list.settings.page_length;
+
+			list.children(list.settings.selector + ':not(.pufs-filtered-out)')
+				.slice(from, to)
+				.fadeIn();
+
+			// Keep track of what page we're on
+			list.data('page', target_page);
+			
+			// Update next/prev buttons
+			if (list.settings.next_prev === true) {				
+				// Next Button
+				if (target_page === list.data('num_pages')) {
+					$('#pufs-next-button').hide();
+				}
+				else {
+					$('#pufs-next-button').fadeIn();
+				}
+
+				// Previous Button
+				if (target_page === 1) {
+					$('#pufs-prev-button').hide();
+				}
+				else {
+					$('#pufs-prev-button').fadeIn();
+				}
+			}
+		}
+		
+		return func;
 	}
 	
 }( jQuery ));
