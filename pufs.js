@@ -128,6 +128,13 @@
 	// Change the selector after a change in filtering
 	function update_filter(list) {
 		var func = function() {
+			// Set the active class on the filter
+			$(list.settings.filter_selector).each(function() {
+				$(this).removeClass('active');
+			});
+
+			$(this).addClass('active');
+			
 			// Get the string we will filter on
 			var filter = $(this).data('pufs-filter');
 			
