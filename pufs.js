@@ -14,7 +14,7 @@
 			filter_selector: '#pufs-filter li',			
 			search: false,
 			search_selector: '#pufs-search',
-			search_interval: 150
+			search_interval: 200
 		}, options );
 		
 		// Store the elements we create for later access
@@ -46,6 +46,7 @@
 			    clearTimeout(typing_timer);
 			
 				search_value = $(this).val();
+				search_value = search_value.toLowerCase();
 				
 		        typing_timer = setTimeout(update_search, list.settings.search_interval, list, search_value);
 			});
