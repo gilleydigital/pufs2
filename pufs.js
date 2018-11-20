@@ -8,6 +8,8 @@
 			selector: 'li',
 			page_length: 6,
 			next_prev: false,
+			next_text: 'Next',
+			prev_text: 'Previous',
 			filter: false,
 			filter_selector: '#pufs-filter li',			
 			search: false,
@@ -89,11 +91,11 @@
 		// Create next/prev buttons if applicable
 		if (list.settings.next_prev === true) {
 			// Prev Button
-			var prev_button = $('<li id="pufs-prev-button">Previous</li>')
+			var prev_button = $('<li id="pufs-prev-button">' + list.settings.prev_text + '</li>')
 				.hide();
 
 			// Next Button
-			var next_button = $('<li id="pufs-next-button">Next</li>')
+			var next_button = $('<li id="pufs-next-button">' + list.settings.next_text + '</li>')
 				.hide();
 				
 			// User clicks prev
@@ -162,7 +164,7 @@
 
 		// Filter info
 		if (list.filters.filter) {
-			selector = selector + '[data-pufs-filter="' + list.filters.filter + '"]';
+			selector = selector + '[data-pufs-filter~="' + list.filters.filter + '"]';
 		}
 		
 		// Search info
